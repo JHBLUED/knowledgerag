@@ -4,15 +4,16 @@ __pycache__/
 *.egg-info/
 .eggs/
 
-# 虚拟环境与 uv
+# 虚拟环境（依赖用 uv.lock 锁定，lock 文件要提交）
 .venv/
-uv.lock
 
 # 环境变量（含密钥，永不入库）
 .env
 
 # 测试与覆盖率
 .pytest_cache/
+.pytest_tmp/
+pytest-of-*/
 .coverage
 htmlcov/
 
