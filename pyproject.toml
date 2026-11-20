@@ -11,6 +11,8 @@ dependencies = [
     "pypdf>=7.1.0",
     "python-docx>=1.2.0",
     "chromadb>=1.5.9",
+    "rank-bm25>=0.2.2",
+    "jieba>=0.42.1",
 ]
 
 [dependency-groups]
@@ -29,3 +31,8 @@ default = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# jieba 内部用了老式正则，在 Python 3.12+ 会抛 SyntaxWarning。
+# 这是第三方库的问题，不影响功能，这里静音以保持测试日志干净。
+filterwarnings = [
+    "ignore::SyntaxWarning",
+]

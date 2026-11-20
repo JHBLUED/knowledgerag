@@ -23,10 +23,14 @@ if TYPE_CHECKING:  # 只在类型检查时导入，运行时不依赖 chromadb
 
 @dataclass
 class SearchHit:
-    """一条检索结果。"""
+    """一条检索结果。
+
+    id 是分块的唯一标识（`文件名#序号`），混合检索融合时用来识别"同一条结果"。
+    """
 
     text: str
     score: float
+    id: str = ""
     source: str = ""
     title: str = ""
     section: str = ""
@@ -159,6 +163,7 @@ class ChromaStore:
                 SearchHit(
                     text=documents[i] or "",
                     score=1.0 - distance,
+                    id=ids[i] if i < len(ids) else "",
                     source=str(meta.pop("source", "") or ""),
                     title=str(meta.pop("title", "") or ""),
                     section=str(meta.pop("section", "") or ""),
