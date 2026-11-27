@@ -17,6 +17,10 @@ pytest-of-*/
 .coverage
 htmlcov/
 
+# 第三方库生成的缓存（jieba 词典缓存等）
+jieba.cache
+*.cache
+
 # IDE
 .idea/
 .vscode/

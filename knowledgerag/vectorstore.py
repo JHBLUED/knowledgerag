@@ -56,11 +56,14 @@ class ChromaStore:
         import chromadb  # 懒加载：没装 chromadb 时，仅 import 本模块不会报错
 
         self.embedder = embedder or HashingEmbedder()
-        self._client = (
-            chromadb.PersistentClient(path=str(persist_dir))
-            if persist_dir
-            else chromadb.EphemeralClient()
-        )
+        if persist_dir:
+            # 目录不存在时 Chroma 的 SQLite 会报 "unable to open database file"，
+            # 所以必须先把目录建出来（父目录一起建）。
+            path = Path(persist_dir)
+            path.mkdir(parents=True, exist_ok=True)
+            self._client = chromadb.PersistentClient(path=str(path))
+        else:
+            self._client = chromadb.EphemeralClient()
         self._collection = self._client.get_or_create_collection(
             name=collection_name,
             metadata={"hnsw:space": "cosine"},
@@ -112,7 +115,9 @@ class ChromaStore:
             metadatas.append(meta)
 
         embeddings = self._embed_matrix(documents)
-        self._collection.add(
+        # 用 upsert 而不是 add：同 id 重复写入是幂等的。
+        # 这样「重启后用真源重建索引」不会因为 id 已存在而报错。
+        self._collection.upsert(
             ids=ids,
             documents=documents,
             metadatas=metadatas,
